@@ -13,35 +13,62 @@ public class CuentaBancaria {
     protected double saldo;
     protected double tasa;
     protected Calendar creacion;
-    protected ArrayList<String> historial;
-    
-    public CuentaBancaria(int numero, String cliente, double tasa){
+    protected TipoCuenta tipo;
+    protected String moneda;
+    protected String[] historial = new String[50];
+    protected int mov =0;
+    protected int maxMov=50;
+    public CuentaBancaria(int numero, String cliente, String moneda){
     this.cliente= cliente;
     this.numero=numero;
-    this.tasa=tasa;
+    this.moneda=moneda;
     this.creacion= Calendar.getInstance();
-    this.saldo = 500;
-    this.historial= new ArrayList<>();
-    this.historial.add("Cuenta creada con saldo inicial e 500Lps. ");
+    this.saldo = 0;
+    this.tipo=TipoCuenta.CHEQUES;
+    this.historial[mov]=("Cuenta creada con saldo inicial de 0. ");
+    mov++;
     }
-    
+    public CuentaBancaria(int numero, String cliente, String moneda, TipoCuenta tipo){
+    this.cliente= cliente;
+    this.numero=numero;
+    this.moneda=moneda;
+    this.creacion= Calendar.getInstance();
+    this.saldo = 0;
+    this.tipo=tipo;
+    this.historial[mov]=("Cuenta creada con saldo inicial de 0. ");
+    mov++;
+    }
     
     public void depositar(double monto){
     try{
-        if(monto<=0){System.out.println("Insuficiente Saldo");}
-        else{this.saldo+=monto;}
-        historial.add("Deposito + "+monto);
-    }catch(Exception e){System.out.println(e.getMessage());
+        if(monto<=0){
+            throw new IllegalArgumentException("Cantidad de monto illegal");
+        }
+        else{
+            this.saldo+=monto;
+        }
+        registrarMovimiento("Deposito + "+monto);
+    }catch(IllegalArgumentException e){System.out.println(e.getMessage());
     }
     }
     
     public boolean retirar(double monto){
-    if(monto>0&&this.saldo>=monto){
+    try{if(monto>0&&this.saldo>=monto){
         this.saldo-=monto;
-        historial.add("Retiro - "+monto);
-        return true;
+        registrarMovimiento("Retiro - "+monto);
+    
+        return true;}
+    
+        else if(monto<=0){
+            throw new IllegalArgumentException("Error en la cantidad del monto");
+        }
+    
+        System.out.println("monto insuficiente");
+        return false;
+        
+    }catch(IllegalArgumentException E){
+    System.out.println(E.getMessage());
     }
-    historial.add("Retiro Fallido: -"+monto);
     return false;
     }
     
@@ -58,18 +85,37 @@ public class CuentaBancaria {
         return saldo;
     }
     
+    public void registrarMovimiento(String linea) {
+    try {
+        if (mov >= 50) {
+            throw new IllegalStateException("El historial de movimientos está completamente lleno.");
+        }
+        
+        historial[mov]=linea;
+        this.mov++;
+
+    }catch (IllegalStateException e) {
+        System.err.println("ERROR " + e.getMessage());
+    }
+
+}
+     public void aplicarIntereses(){
+        double interes=saldo*tasa;
+        saldo=saldo+interes;
+        registrarMovimiento("Intereses Aplicados +"+interes);
+        
+    
+    }
     public String toString(){
         return String.format("Cuenta: #%d | %s | #%.2f", numero,cliente,saldo);
     
     }
     
-    public void transferencia(double monto, CuentaBancaria destino){
-    if(this.retirar(monto)){
-        destino.depositar(monto);
+    public void quienSoy(){
+    System.out.println("CuentaBancaria (Clase base)");
+
+    }
     
-    this.historial.add("Transferencia Enviada a # "+ destino.numero+" : "+monto);
-        }else{
-    System.out.println("Transferencia Fallida");
     }
-    }
-}
+
+
