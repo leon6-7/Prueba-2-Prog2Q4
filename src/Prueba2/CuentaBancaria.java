@@ -99,12 +99,16 @@ public class CuentaBancaria {
     }
 
 }
-     public void aplicarIntereses(){
+     public void registrarIntereses(){
         double interes=saldo*tasa;
         saldo=saldo+interes;
         registrarMovimiento("Intereses Aplicados +"+interes);
-        
-    
+   
+    }
+     
+     public void reintegrar(double monto) {
+        this.saldo += monto;
+        registrarMovimiento("REVERSA +" + monto + " -> saldo: " + this.saldo);
     }
     public String toString(){
         return String.format("Cuenta: #%d | %s | #%.2f", numero,cliente,saldo);
@@ -114,6 +118,42 @@ public class CuentaBancaria {
     public void quienSoy(){
     System.out.println("CuentaBancaria (Clase base)");
 
+    }
+
+    public int getNumero() {
+        return numero;
+    }
+
+    public String getCliente() {
+        return cliente;
+    }
+
+    public double getTasa() {
+        return tasa;
+    }
+
+    public Calendar getCreacion() {
+        return creacion;
+    }
+
+    public TipoCuenta getTipo() {
+        return tipo;
+    }
+
+    public String getMoneda() {
+        return moneda;
+    }
+
+    public String[] getHistorial() {
+        return historial;
+    }
+
+    public int getMov() {
+        return mov;
+    }
+
+    public int getMaxMov() {
+        return maxMov;
     }
     
     }
